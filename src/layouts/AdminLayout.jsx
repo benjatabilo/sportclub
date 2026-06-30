@@ -1,6 +1,7 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { Button, Container, Nav, Navbar } from "react-bootstrap";
-import { logout, getUser } from "../services/authService";
+import { Container, Row, Col, Nav, Button } from "react-bootstrap";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { getUser, logout } from "../services/authService";
+import logo from "../assets/logo.png";
 
 function AdminLayout() {
   const navigate = useNavigate();
@@ -12,31 +13,45 @@ function AdminLayout() {
   };
 
   return (
-    <>
-      <Navbar bg="dark" variant="dark" expand="lg">
-        <Container>
-          <Navbar.Brand>SportClub Admin</Navbar.Brand>
+    <Container fluid>
+      <Row>
+        {/* SIDEBAR: Adaptado para ADMIN (Rojo) */}
+        <Col md={2} className="bg-light min-vh-100 p-3 border-end">
+          <div className="mb-4 text-center">
+            <img
+              src={logo}
+              alt="Logo SportClub"
+              style={{ width: "100px", height: "auto" }}
+            />
+          </div>
           
-          <Nav className="me-auto">
-            <Link className="nav-link" to="/admin/dashboard">
-              Dashboard
-            </Link>
+          <div className="text-danger fw-bold mb-3 px-2">PANEL ADMIN</div>
+          
+          <Nav className="flex-column">
+            <Nav.Link as={Link} to="/admin/dashboard" className="fw-bold text-dark">Inicio Admin</Nav.Link>
+            <Nav.Link as={Link} to="/admin/usuarios" className="fw-bold text-dark">Gestionar Usuarios</Nav.Link>
+            <Nav.Link as={Link} to="/admin/clases" className="fw-bold text-dark">Gestionar Clases</Nav.Link>
+            <Nav.Link as={Link} to="/admin/reportes" className="fw-bold text-dark">Reportes</Nav.Link>
           </Nav>
+        </Col>
 
-          <span className="text-white me-3">
-            {user?.name}
-          </span>
-
-          <Button variant="outline-light" onClick={handleLogout}>
-            Cerrar sesión
-          </Button>
-        </Container>
-      </Navbar>
-
-      <Container className="mt-4">
-        <Outlet />
-      </Container>
-    </>
+        {/* INFO PRINICPAL */}
+        <Col md={10} className="p-4">
+          <div className="d-flex justify-content-end align-items-center mb-4 border-bottom pb-2">
+            <span className="me-3 text-muted">
+              {/* Usamos full_name */}
+              <strong>{user?.full_name}</strong> | <span className="text-danger">{user?.email}</span>
+            </span>
+            <Button variant="outline-danger" size="sm" onClick={handleLogout}>
+              Cerrar Sesión
+            </Button>
+          </div>
+          
+          {/* Aquí se cargan las vistas de Admin */}
+          <Outlet />
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

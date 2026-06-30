@@ -1,6 +1,5 @@
 const API_URL = "http://localhost:3000/api/auth";
 
-// Login contra el backend
 export async function loginUser(credentials) {
   const response = await fetch(`${API_URL}/login`, {
     method: "POST",
@@ -19,7 +18,7 @@ export async function loginUser(credentials) {
   return data;
 }
 
-// Guardar sesión en el navegador
+// para guardar la sesion en el nav.
 export function saveSession(token, user) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
