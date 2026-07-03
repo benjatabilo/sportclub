@@ -1,12 +1,41 @@
-import { Container, Row, Col, Card, Table, Badge } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Container, Row, Col, Card, Table, Badge, Alert } from "react-bootstrap";
 import { getUser } from "../../services/authService";
+import { getUsers } from "../../services/userService"; 
+//import UserCard from "../../components/UserCard";
 
 function AdminDashboard() {
-  const user = getUser();
+  const [users, setUsers] = useState([]); 
+  const [error, setError] = useState(null);
+  const currentUser = getUser();
 
-  // Estadísticas del sistema
+useEffect(() => {
+    getUsers()
+      .then((result) => {
+        // Verifica en la consola qué trae 'result'
+        console.log("Respuesta completa del backend:", result);
+
+        // Si tu API devuelve { ok: true, data: [...] }
+        // Debes acceder a result.data
+        if (result && Array.isArray(result.data)) {
+          setUsers(result.data);
+        } 
+        // Si tu API devuelve el arreglo directamente, deja solo result
+        else if (Array.isArray(result)) {
+          setUsers(result);
+        }
+        else {
+          setError("No se pudo obtener la lista de usuarios.");
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Error al cargar usuarios: " + err.message);
+      });
+  }, []);
+
   const stats = [
-    { title: "Usuarios Totales", value: "125", color: "danger" },
+    { title: "Usuarios Totales", value: Array.isArray(users) ? users.length : 0, color: "danger" },
     { title: "Reservas Hoy", value: "48", color: "danger" },
     { title: "Clases Activas", value: "12", color: "danger" }
   ];
@@ -15,7 +44,7 @@ function AdminDashboard() {
     <Container className="py-4">
       <h2 className="mb-4">Panel de Administración</h2>
       
-      {/* 1. Tarjetas de Estadísticas (Color Rojo para Admin) */}
+      {/* 1. Tarjetas de Estadísticas */}
       <Row className="mb-4">
         {stats.map((stat, idx) => (
           <Col md={4} key={idx}>
@@ -29,8 +58,24 @@ function AdminDashboard() {
         ))}
       </Row>
 
-      {/* 2. Tabla de Gestión de Usuarios */}
-      <h4 className="mb-3 text-danger">Gestión de Usuarios</h4>
+      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
+
+      {/* 2. Galería de Usuarios 
+      <h4 className="mb-3 text-danger">Directorio de Usuarios</h4>
+      <Row className="mb-4">
+        {Array.isArray(users) && users.length > 0 ? (
+          users.map((user) => (
+            <Col md={4} key={user.id} className="mb-3">
+              <UserCard user={user} />
+            </Col>
+          ))
+        ) : (
+          !error && <Col><p className="text-muted">No hay usuarios disponibles.</p></Col>
+        )}
+      </Row> */}
+
+      {/* 3. Tabla de Control (Usando campos reales del modelo) */}
+      <h4 className="mb-3 text-danger">Gestion de Usuarios </h4>
       <Card className="shadow-sm">
         <Card.Body>
           <Table responsive hover>
@@ -39,22 +84,16 @@ function AdminDashboard() {
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Rol</th>
-                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Juan Pérez</td>
-                <td>juan@demo.cl</td>
-                <td><Badge bg="secondary">User</Badge></td>
-                <td><Badge bg="success">Activo</Badge></td>
-              </tr>
-              <tr>
-                <td>Ana Coach</td>
-                <td>ana@demo.cl</td>
-                <td><Badge bg="warning">Coach</Badge></td>
-                <td><Badge bg="success">Activo</Badge></td>
-              </tr>
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.full_name}</td> {/* Campo de image_a53065.png y image_a5306d.png */}
+                  <td>{user.email}</td>
+                  <td><Badge bg={user.role === 'admin' ? 'danger' : 'secondary'}>{user.role}</Badge></td>
+                </tr>
+              ))}
             </tbody>
           </Table>
         </Card.Body>

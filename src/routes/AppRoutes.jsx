@@ -14,6 +14,8 @@ import AdminLayout from "../layouts/AdminLayout"
 
 import ProtectedRoute from "./ProtectedRoute"
 import RoleRoute from "./RoleRoute"
+import UsersPage from "../pages/admin/UsersPage"
+
 
 function AppRoutes() {
   return (
@@ -33,6 +35,7 @@ function AppRoutes() {
 
         <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<UsersPage />} />
         </Route>
 
         <Route path="/perfil" element={<ProtectedRoute><h1>Perfil del usuario autenticado</h1></ProtectedRoute>} />
@@ -40,5 +43,7 @@ function AppRoutes() {
     </BrowserRouter>
   );
 }
+
+
 
 export default AppRoutes

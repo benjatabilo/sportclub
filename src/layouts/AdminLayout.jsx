@@ -24,16 +24,16 @@ function AdminLayout() {
               style={{ width: "100px", height: "auto" }}
             />
           </div>
-          
-          <div className="text-danger fw-bold mb-3 px-2">PANEL ADMIN</div>
-          
+                    
           <Nav className="flex-column">
-            <Nav.Link as={Link} to="/admin/dashboard" className="fw-bold text-dark">Inicio Admin</Nav.Link>
-            <Nav.Link as={Link} to="/admin/usuarios" className="fw-bold text-dark">Gestionar Usuarios</Nav.Link>
+            <Nav.Link as={Link} to="/admin/users" className="fw-bold text-dark">Gestionar Usuarios</Nav.Link>
             <Nav.Link as={Link} to="/admin/clases" className="fw-bold text-dark">Gestionar Clases</Nav.Link>
             <Nav.Link as={Link} to="/admin/reportes" className="fw-bold text-dark">Reportes</Nav.Link>
           </Nav>
         </Col>
+        
+
+        
 
         {/* INFO PRINICPAL */}
         <Col md={10} className="p-4">
