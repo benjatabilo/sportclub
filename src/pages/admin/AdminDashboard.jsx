@@ -1,99 +1,51 @@
-import { useEffect, useState } from "react";
-import { Container, Row, Col, Card, Table, Badge, Alert } from "react-bootstrap";
-import { getUser } from "../../services/authService";
-import { getUsers } from "../../services/userService"; 
-//import UserCard from "../../components/UserCard";
+import { Container, Row, Col, Card, Table } from "react-bootstrap";
 
 function AdminDashboard() {
-  const [users, setUsers] = useState([]); 
-  const [error, setError] = useState(null);
-  const currentUser = getUser();
-
-useEffect(() => {
-    getUsers()
-      .then((result) => {
-        // Verifica en la consola qué trae 'result'
-        console.log("Respuesta completa del backend:", result);
-
-        // Si tu API devuelve { ok: true, data: [...] }
-        // Debes acceder a result.data
-        if (result && Array.isArray(result.data)) {
-          setUsers(result.data);
-        } 
-        // Si tu API devuelve el arreglo directamente, deja solo result
-        else if (Array.isArray(result)) {
-          setUsers(result);
-        }
-        else {
-          setError("No se pudo obtener la lista de usuarios.");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Error al cargar usuarios: " + err.message);
-      });
-  }, []);
-
+  // Datos de ejemplo para las estadísticas
   const stats = [
-    { title: "Usuarios Totales", value: Array.isArray(users) ? users.length : 0, color: "danger" },
-    { title: "Reservas Hoy", value: "48", color: "danger" },
-    { title: "Clases Activas", value: "12", color: "danger" }
+    { title: "Usuarios Activos", value: "1,284", color: "primary" },
+    { title: "Salas Ocupadas", value: "8/12", color: "success" },
+    { title: "Clases Hoy", value: "24", color: "warning" },
   ];
 
   return (
-    <Container className="py-4">
-      <h2 className="mb-4">Panel de Administración</h2>
-      
-      {/* 1. Tarjetas de Estadísticas */}
+    <Container fluid className="py-4">
+
+      {/* 2. Tarjetas de Estadísticas (Estilo image_493842.jpg) */}
       <Row className="mb-4">
         {stats.map((stat, idx) => (
           <Col md={4} key={idx}>
-            <Card className={`text-white bg-${stat.color} shadow-sm`}>
+            <Card className="shadow-sm border-0 h-100">
               <Card.Body>
-                <Card.Title>{stat.title}</Card.Title>
-                <Card.Text className="h2">{stat.value}</Card.Text>
+                <small className="text-muted text-uppercase fw-bold">{stat.title}</small>
+                <h3 className="fw-bold mt-2">{stat.value}</h3>
               </Card.Body>
             </Card>
           </Col>
         ))}
       </Row>
 
-      {error && <Alert variant="danger" className="mb-4">{error}</Alert>}
-
-      {/* 2. Galería de Usuarios 
-      <h4 className="mb-3 text-danger">Directorio de Usuarios</h4>
-      <Row className="mb-4">
-        {Array.isArray(users) && users.length > 0 ? (
-          users.map((user) => (
-            <Col md={4} key={user.id} className="mb-3">
-              <UserCard user={user} />
-            </Col>
-          ))
-        ) : (
-          !error && <Col><p className="text-muted">No hay usuarios disponibles.</p></Col>
-        )}
-      </Row> */}
-
-      {/* 3. Tabla de Control (Usando campos reales del modelo) */}
-      <h4 className="mb-3 text-danger">Gestion de Usuarios </h4>
-      <Card className="shadow-sm">
+      {/* 3. Tabla de Actividad Reciente */}
+      <h5 className="mb-3">Últimas Asignaciones</h5>
+      <Card className="shadow-sm border-0">
         <Card.Body>
-          <Table responsive hover>
+          <Table responsive hover className="mb-0">
             <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Rol</th>
+              <tr className="text-muted">
+                <th>Deporte</th>
+                <th>Sala</th>
+                <th>Coach</th>
+                <th>Horario</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.full_name}</td> {/* Campo de image_a53065.png y image_a5306d.png */}
-                  <td>{user.email}</td>
-                  <td><Badge bg={user.role === 'admin' ? 'danger' : 'secondary'}>{user.role}</Badge></td>
-                </tr>
-              ))}
+              <tr>
+                <td>Yoga</td>
+                <td>Sala 1</td>
+                <td>Ana Pérez</td>
+                <td>08:00 AM</td>
+              </tr>
+              {/* Aquí podrías mapear tus datos reales */}
             </tbody>
           </Table>
         </Card.Body>

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import Home from "../pages/Home"
 import Login from "../pages/Login"
+import Register from "../pages/Register"
 import Unauthorized from "../pages/Unauthorized"
 
 import UserDashboard from "../pages/user/UserDashboard"
@@ -16,6 +17,10 @@ import ProtectedRoute from "./ProtectedRoute"
 import RoleRoute from "./RoleRoute"
 import UsersPage from "../pages/admin/UsersPage"
 
+import Salas from "../pages/admin/Salas"
+import Sport from "../pages/admin/Sport"
+import Schedules from "../pages/admin/Shedules"
+
 
 function AppRoutes() {
   return (
@@ -23,6 +28,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} /> 
 
         <Route path="/user" element={<RoleRoute allowedRoles={["user"]}><UserLayout /></RoleRoute>}>
@@ -36,6 +42,11 @@ function AppRoutes() {
         <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="salas" element={<Salas />} />
+          <Route path="sport" element={<Sport />} />
+          <Route path="shedules" element={<Schedules />} />
+
+
         </Route>
 
         <Route path="/perfil" element={<ProtectedRoute><h1>Perfil del usuario autenticado</h1></ProtectedRoute>} />

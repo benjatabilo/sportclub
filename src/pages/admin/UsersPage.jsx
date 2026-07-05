@@ -86,13 +86,29 @@ function UsersPage() {
 
   return (
     <div className="container py-4">
+      {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Gestión de Usuarios</h2>
-        <Button variant="primary" onClick={openCreateModal}>
+        <h2 
+          className="mb-0" 
+          style={{ fontSize: '1.4rem', color: '#515151' }}
+        >
+          Gestión de Usuarios
+        </h2>
+        <Button 
+          onClick={openCreateModal}
+          className="fw-bold btn-sm px-3 py-2"
+          style={{ 
+            backgroundColor: '#ff7c2a', 
+            borderColor: '#ffbb00', 
+            fontSize: '0.7rem', 
+            color: '#ffffff' 
+          }}
+        >
           Nuevo Usuario
         </Button>
       </div>
 
+      {/* Content */}
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" />
@@ -100,8 +116,8 @@ function UsersPage() {
         </div>
       ) : (
         <Card className="shadow-sm">
-          <Table responsive hover className="mb-0">
-            <thead>
+          <Table responsive hover className="mb-0 align-middle">
+            <thead className="table-light">
               <tr>
                 <th>ID</th>
                 <th>Nombre</th>
@@ -122,10 +138,19 @@ function UsersPage() {
                     </Badge>
                   </td>
                   <td>
-                    <Button variant="outline-primary" size="sm" className="me-2" onClick={() => openEditModal(user)}>
+                    <Button 
+                      variant="outline-primary" 
+                      size="sm" 
+                      className="me-2" 
+                      onClick={() => openEditModal(user)}
+                    >
                       Editar
                     </Button>
-                    <Button variant="outline-danger" size="sm" onClick={() => handleDelete(user)}>
+                    <Button 
+                      variant="outline-danger" 
+                      size="sm" 
+                      onClick={() => handleDelete(user)}
+                    >
                       Eliminar
                     </Button>
                   </td>
