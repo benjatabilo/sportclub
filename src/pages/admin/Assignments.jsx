@@ -3,7 +3,7 @@ import { Container, Form, Button, Spinner } from "react-bootstrap";
 import { authFetch } from "../../services/apiFetch"; 
 import Swal from "sweetalert2";
 
-function Sport() {
+function Assigments() {
   const [loading, setLoading] = useState(false);
   const [listas, setListas] = useState({ rooms: [], sports: [], coaches: [] });
   const [form, setForm] = useState({ room_id: "", sport_id: "", coach_id: "" });
@@ -95,4 +95,4 @@ const handleAssign = async (e) => {
   );
 }
 
-export default Sport;
+export default Assigments;

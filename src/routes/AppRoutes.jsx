@@ -18,9 +18,13 @@ import RoleRoute from "./RoleRoute"
 import UsersPage from "../pages/admin/UsersPage"
 
 import Salas from "../pages/admin/Salas"
-import Sport from "../pages/admin/Sport"
+import Assignments from "../pages/admin/Assignments"
 import Schedules from "../pages/admin/Shedules"
+import Sports from "../pages/admin/Sports"
 
+// IMPORTACIONES PARA USUARIO//
+import UserClass from "../pages/user/UserClass"
+import UserReserve from "../pages/user/UserReserve"
 
 function AppRoutes() {
   return (
@@ -33,6 +37,10 @@ function AppRoutes() {
 
         <Route path="/user" element={<RoleRoute allowedRoles={["user"]}><UserLayout /></RoleRoute>}>
           <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="userclass" element={<UserClass />} />
+          <Route path="userReserve" element={<UserReserve />} />
+
+
         </Route>
 
         <Route path="/coach" element={<RoleRoute allowedRoles={["coach"]}><CoachLayout /></RoleRoute>}>
@@ -43,7 +51,8 @@ function AppRoutes() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="salas" element={<Salas />} />
-          <Route path="sport" element={<Sport />} />
+          <Route path="assignments" element={<Assignments />} />
+          <Route path="sports" element={<Sports/>} />
           <Route path="shedules" element={<Schedules />} />
 
 

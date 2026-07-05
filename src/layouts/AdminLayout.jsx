@@ -3,8 +3,9 @@ import { Container, Row, Col, Nav, Button, Modal } from "react-bootstrap"; // 2.
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getUser, logout } from "../services/authService";
 import logo from "../assets/logo.png";
-import Sport from "../pages/admin/Sport"; // 3. Importar tu componente Sport
-import Schedules from "../pages/admin/Shedules";
+import Assigments from "../pages/admin/Assignments"; 
+import Shedules from "../pages/admin/Shedules";
+import Sports from "../pages/admin/Sports";
 
 function AdminLayout() {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ function AdminLayout() {
     { to: "/admin/dashboard", label: "Inicio" },
     { to: "/admin/users", label: "Gestionar Usuarios" },
     { to: "/admin/salas", label: "Gestión de Salas" },
-    { to: "/admin/asignaciones", label: "Asignaciones" },
+    { to: "/admin/sports", label: "Gestión Deportes" },
     { to: "/admin/shedules", label: "Gestión de Horarios" },
   ];
 
@@ -38,7 +39,7 @@ function AdminLayout() {
             ))}
             {/* 5. Botón para abrir el modal */}
             <div className="nav-link px-3 py-2 rounded-2 text-secondary" style={{ fontSize: "0.75rem", textAlign: "left", cursor: "pointer" }} onClick={() => setShowSportModal(true)}>
-              Gestión de Deportes
+              Asignaciones
             </div>
           </Nav>
         </Col>
@@ -55,10 +56,10 @@ function AdminLayout() {
       {/* 6. Definición del Modal */}
       <Modal show={showSportModal} onHide={() => setShowSportModal(false)} size="md">
         <Modal.Header closeButton>
-          <Modal.Title>Gestión de Sport</Modal.Title>
+          <Modal.Title>Asignaciones</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Sport />
+          <Assigments />
         </Modal.Body>
       </Modal>
     </Container>
