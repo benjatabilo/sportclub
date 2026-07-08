@@ -26,6 +26,10 @@ import Sports from "../pages/admin/Sports"
 import UserClass from "../pages/user/UserClass"
 import UserReserve from "../pages/user/UserReserve"
 
+//importaciones para el coach
+import CoachClass from "../pages/coach/CoachClass";
+import CoachSchedule from "../pages/coach/CoachSchedule"
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -38,13 +42,15 @@ function AppRoutes() {
         <Route path="/user" element={<RoleRoute allowedRoles={["user"]}><UserLayout /></RoleRoute>}>
           <Route path="dashboard" element={<UserDashboard />} />
           <Route path="userclass" element={<UserClass />} />
-          <Route path="userReserve" element={<UserReserve />} />
-
-
+          <Route path="userreserve" element={<UserReserve />} />
         </Route>
+
 
         <Route path="/coach" element={<RoleRoute allowedRoles={["coach"]}><CoachLayout /></RoleRoute>}>
           <Route path="dashboard" element={<CoachDashboard />} />
+          <Route path="coachclass" element={<CoachClass />} />
+          <Route path="coachschedule" element={<CoachSchedule />} />
+
         </Route>
 
         <Route path="/admin" element={<RoleRoute allowedRoles={["admin"]}><AdminLayout /></RoleRoute>}>

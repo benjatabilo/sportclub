@@ -1,33 +1,48 @@
 import { useState, useEffect } from "react";
 import { Container, Table, Button, Spinner } from "react-bootstrap";
-import { authFetch } from "../../services/apiFetch";
+import { getAvailableClasses } from "../../services/memberService";
+import { createReservation } from "../../services/reservationService";
 import Swal from "sweetalert2";
 
 const DIAS = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo" };
 
+function formatTime(t) {
+  return t ? t.substring(0, 5) : "N/A";
+}
+
+/**
+ * GET /member/classes devuelve asignaciones (SportRoom) con sport, room, coach
+ * y un arreglo "schedules" (ver member.repository.js -> findAvailableClasses).
+ * Aquí las "aplanamos" a una fila por horario, que es lo que el usuario
+ * realmente reserva (class_schedule_id).
+ */
+function flattenSchedules(sportRooms) {
+  const rows = [];
+  sportRooms.forEach((sr) => {
+    (sr.schedules || []).forEach((schedule) => {
+      rows.push({
+        scheduleId: schedule.id,
+        day_of_week: schedule.day_of_week,
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+        sportName: sr.sport?.name || "Deporte",
+        roomName: sr.room?.name || "Sala",
+        coachEmail: sr.coach?.email,
+      });
+    });
+  });
+  return rows;
+}
+
 function UserClass() {
   const [loading, setLoading] = useState(true);
   const [clases, setClases] = useState([]);
-  const [dataMaestra, setDataMaestra] = useState({ rooms: [], sports: [], coaches: [], sportRooms: [] });
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [schedules, sRooms, sList, rList, uList] = await Promise.all([
-        authFetch('/class-schedules'), //
-        authFetch('/sport-rooms'),     //
-        authFetch('/sports'),          //
-        authFetch('/rooms'),           //[cite: 2]
-        authFetch('/users')            //[cite: 2]
-      ]);
-
-      setClases(schedules.data || schedules || []);
-      setDataMaestra({
-        sportRooms: sRooms.data || sRooms || [],
-        sports: sList.data || sList || [],
-        rooms: rList.data || rList || [],
-        coaches: (uList.data || uList || []).filter(u => u.role === 'coach')
-      });
+      const response = await getAvailableClasses();
+      setClases(flattenSchedules(response.data || []));
     } catch (error) {
       Swal.fire("Error", "No se pudieron cargar las clases", "error");
     } finally {
@@ -35,43 +50,36 @@ function UserClass() {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const getDetalleClase = (sportRoomId) => {
-    const sr = dataMaestra.sportRooms.find(a => a.id == sportRoomId);
-    if (!sr) return "Cargando...";
-
-    const sport = dataMaestra.sports.find(s => s.id == sr.sport_id)?.name || "Deporte";
-    const room = dataMaestra.rooms.find(r => r.id == sr.room_id)?.name || "Sala";
-    const coach = dataMaestra.coaches.find(c => c.id == sr.coach_id)?.full_name || "Sin coach";
-
-    return `${sport} en ${room} (Coach: ${coach})`;
-  };
-
-  const handleReservar = async (claseId) => {
+  const handleReservar = async (scheduleId) => {
     const result = await Swal.fire({
-      title: '¿Confirmar reserva?',
+      title: "¿Confirmar reserva?",
       text: "Se registrará tu cupo en esta clase.",
-      icon: 'question',
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: 'Sí, reservar'
+      confirmButtonText: "Sí, reservar",
     });
 
     if (result.isConfirmed) {
       try {
-        await authFetch('/reservations', {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ class_schedule_id: claseId }) //[cite: 2]
-        });
+        await createReservation(scheduleId);
         Swal.fire("¡Éxito!", "Reserva realizada", "success");
       } catch (error) {
-        Swal.fire("Error", "No se pudo realizar la reserva", "error");
+        Swal.fire("Error", error.message || "No se pudo realizar la reserva", "error");
       }
     }
   };
 
-  if (loading) return <Container className="p-4 text-center"><Spinner animation="border" /></Container>;
+  if (loading) {
+    return (
+      <Container className="p-4 text-center">
+        <Spinner animation="border" />
+      </Container>
+    );
+  }
 
   return (
     <Container className="p-4">
@@ -86,16 +94,31 @@ function UserClass() {
           </tr>
         </thead>
         <tbody>
-          {clases.map(c => (
-            <tr key={c.id}>
-              <td className="align-middle">{DIAS[c.day_of_week]}</td>
-              <td className="align-middle">{c.start_time} - {c.end_time}</td>
-              <td className="align-middle">{getDetalleClase(c.sport_room_id)}</td>
-              <td className="align-middle">
-                <Button variant="primary" size="sm" onClick={() => handleReservar(c.id)}>Reservar</Button>
+          {clases.length > 0 ? (
+            clases.map((c) => (
+              <tr key={c.scheduleId}>
+                <td className="align-middle">{DIAS[c.day_of_week] || "N/A"}</td>
+                <td className="align-middle">
+                  {formatTime(c.start_time)} - {formatTime(c.end_time)}
+                </td>
+                <td className="align-middle">
+                  {c.sportName} en {c.roomName}
+                  {c.coachEmail ? ` (Coach: ${c.coachEmail})` : ""}
+                </td>
+                <td className="align-middle">
+                  <Button variant="primary" size="sm" onClick={() => handleReservar(c.scheduleId)}>
+                    Reservar
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="text-center text-muted">
+                No hay clases disponibles por el momento.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
     </Container>

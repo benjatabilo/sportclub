@@ -41,8 +41,9 @@ const handleAssign = async (e) => {
   e.preventDefault();
   setLoading(true);
   try {
-    // El payload debe contener sport_id, room_id y coach_id
-    await authFetch("/api/sport-rooms", { 
+    // apiFetch ya antepone /api automáticamente (ver BASE_URL en apiFetch.js),
+    // por eso aquí va solo "/sport-rooms" y no "/api/sport-rooms".
+    await authFetch("/sport-rooms", { 
       method: "POST", 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form) 

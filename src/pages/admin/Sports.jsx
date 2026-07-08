@@ -3,10 +3,13 @@ import { Container, Table, Button, Modal, Form } from "react-bootstrap";
 import { authFetch } from "../../services/apiFetch";
 import Swal from "sweetalert2";
 
-function Sports() { // Nombre del componente actualizado
+function Sports() {
   const [sports, setSports] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "" });
+  // El modelo Sport no tiene "description": tiene "objective" (obligatorio,
+  // mín. 5 caracteres) y "duration" en minutos (obligatorio, entero > 0).
+  // Ver sport.validator.js.
+  const [formData, setFormData] = useState({ name: "", objective: "", duration: "" });
 
   const loadSports = async () => {
     try {
@@ -25,14 +28,18 @@ function Sports() { // Nombre del componente actualizado
       await authFetch('/sports', { 
         method: 'POST', 
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData) 
+        body: JSON.stringify({
+          name: formData.name,
+          objective: formData.objective,
+          duration: Number(formData.duration),
+        }) 
       });
       Swal.fire("Éxito", "Deporte registrado", "success");
       setShowModal(false);
       loadSports();
-      setFormData({ name: "", description: "" });
+      setFormData({ name: "", objective: "", duration: "" });
     } catch (error) {
-      Swal.fire("Error", "No se pudo guardar el deporte", "error");
+      Swal.fire("Error", error.message || "No se pudo guardar el deporte", "error");
     }
   };
 
@@ -47,14 +54,16 @@ function Sports() { // Nombre del componente actualizado
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Descripción</th>
+            <th>Objetivo</th>
+            <th>Duración (min)</th>
           </tr>
         </thead>
         <tbody>
           {sports.map(s => (
             <tr key={s.id}>
               <td>{s.name}</td>
-              <td>{s.description}</td>
+              <td>{s.objective}</td>
+              <td>{s.duration}</td>
             </tr>
           ))}
         </tbody>
@@ -66,11 +75,15 @@ function Sports() { // Nombre del componente actualizado
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>
-              <Form.Control required onChange={(e) => setFormData({...formData, name: e.target.value})} />
+              <Form.Control required minLength={3} value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Descripción</Form.Label>
-              <Form.Control as="textarea" onChange={(e) => setFormData({...formData, description: e.target.value})} />
+              <Form.Label>Objetivo</Form.Label>
+              <Form.Control as="textarea" required minLength={5} value={formData.objective} onChange={(e) => setFormData({...formData, objective: e.target.value})} />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Duración (minutos)</Form.Label>
+              <Form.Control type="number" min={1} required value={formData.duration} onChange={(e) => setFormData({...formData, duration: e.target.value})} />
             </Form.Group>
             <Button type="submit">Guardar</Button>
           </Form>

@@ -1,84 +1,168 @@
-import { Container, Row, Col, Card, Button, Table, Alert } from "react-bootstrap";
-import { getUser } from "../../services/authService";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Card, Table, Spinner, Badge } from "react-bootstrap";
+import { getMemberDashboard } from "../../services/memberService";
+import { getMyReservations } from "../../services/reservationService";
+import Swal from "sweetalert2";
+
+const BRAND = "#006b71";
+const DIAS = { 1: "Lun", 2: "Mar", 3: "Mié", 4: "Jue", 5: "Vie", 6: "Sáb", 7: "Dom" };
+
+function formatTime(t) {
+  return t ? t.substring(0, 5) : "N/A";
+}
+
+// Ícono simple de mancuerna, en SVG puro (sin dependencias externas)
+function DumbbellIcon({ size = 26, color = "#fff" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6.5 6.5 L17.5 17.5" />
+      <path d="M4 4 L7 7" />
+      <path d="M17 17 L20 20" />
+      <rect x="2" y="8" width="4" height="4" rx="1" transform="rotate(45 4 10)" />
+      <rect x="18" y="14" width="4" height="4" rx="1" transform="rotate(45 20 16)" />
+    </svg>
+  );
+}
+
+function StatCard({ label, value }) {
+  return (
+    <Card
+      className="border-0 h-100 text-white shadow-sm"
+      style={{
+        background: `linear-gradient(135deg, ${BRAND} 0%, #2b2b2b 130%)`,
+        borderRadius: "1rem",
+      }}
+    >
+      <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center py-4">
+        <div
+          className="d-flex align-items-center justify-content-center mb-2"
+          style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.15)" }}
+        >
+          <DumbbellIcon />
+        </div>
+        <h2 className="fw-bold mb-0" style={{ fontSize: "2.5rem" }}>
+          {value}
+        </h2>
+        <small className="text-uppercase fw-semibold" style={{ letterSpacing: "1px" }}>
+          {label}
+        </small>
+      </Card.Body>
+    </Card>
+  );
+}
 
 function UserDashboard() {
-  const user = getUser(); // Obtenemos el usuario real
+  const [loading, setLoading] = useState(true);
+  const [dashboard, setDashboard] = useState(null);
+  const [misReservasActivas, setMisReservasActivas] = useState(0);
 
-  const reservations = [
-    { id: 1, class: "Yoga", day: "Lunes", time: "08:00", coach: "Ana Smith" },
-    { id: 2, class: "Crossfit", day: "Martes", time: "18:00", coach: "Luis Perez" },
-    { id: 3, class: "Natación", day: "Miércoles", time: "09:00", coach: "Carlos Ruíz" },
-    { id: 4, class: "Spinning", day: "Jueves", time: "19:00", coach: "Marta Díaz" },
-    { id: 5, class: "Pilates", day: "Viernes", time: "10:00", coach: "Ana Smith" },
-  ];
+  const loadDashboard = async () => {
+    try {
+      setLoading(true);
+      // /member/dashboard ya trae todo consolidado: available_classes,
+      // available_sports, available_rooms, available_schedules y next_classes
+      // (ver member.service.js -> getDashboard).
+      const [dashboardRes, reservasRes] = await Promise.all([
+        getMemberDashboard(),
+        getMyReservations(),
+      ]);
+
+      setDashboard(dashboardRes.data);
+      const reservas = reservasRes.data || [];
+      setMisReservasActivas(reservas.filter((r) => r.status === "active").length);
+    } catch (error) {
+      Swal.fire("Error", error.message || "No se pudo cargar el dashboard", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <Container fluid className="py-5 text-center">
+        <Spinner animation="border" style={{ color: BRAND }} />
+      </Container>
+    );
+  }
+
+  const nextClasses = dashboard?.next_classes || [];
 
   return (
-    <Container className="py-4">
-      {/* 1. Bienvenida con datos reales */}
-      <Alert variant="primary" className="mb-4 shadow-sm">
-        <Alert.Heading>¡Bienvenido, {user?.full_name || "Usuario"}!</Alert.Heading>
-        <p className="mb-0">
-          Continúa entrenando para alcanzar tus metas. ¡Hoy es un gran día para avanzar!
-        </p>
-      </Alert>
+    <Container fluid className="py-4">
+      <Row className="g-3 mb-4">
+        <Col md={3} sm={6}>
+          <StatCard label="Clases Disponibles" value={dashboard?.available_classes ?? 0} />
+        </Col>
+        <Col md={3} sm={6}>
+          <StatCard label="Horarios Disponibles" value={dashboard?.available_schedules ?? 0} />
+        </Col>
+        <Col md={3} sm={6}>
+          <StatCard label="Salas" value={dashboard?.available_rooms ?? 0} />
+        </Col>
+        <Col md={3} sm={6}>
+          <StatCard label="Mis Reservas Activas" value={misReservasActivas} />
+        </Col>
+      </Row>
 
-      <Row>
-        {/* 2. Reservas del usuario */}
-        <Col md={8}>
-          <h4 className="text-primary mb-3">Mis Reservas</h4>
-          <Table striped bordered hover responsive>
-            <thead className="bg-primary text-white">
-              <tr>
-                <th>Clase</th>
-                <th>Día</th>
-                <th>Hora</th>
+      <Card className="border-0 shadow-sm" style={{ borderRadius: "1rem" }}>
+        <Card.Header
+          className="text-white fw-bold text-uppercase py-3"
+          style={{
+            background: BRAND,
+            borderRadius: "1rem 1rem 0 0",
+            letterSpacing: "1px",
+          }}
+        >
+          Próximas Clases Disponibles
+        </Card.Header>
+        <Card.Body className="p-0">
+          <Table responsive hover className="mb-0 align-middle">
+            <thead>
+              <tr className="text-muted">
+                <th className="ps-3">Deporte</th>
+                <th>Sala</th>
                 <th>Coach</th>
+                <th>Horarios</th>
               </tr>
             </thead>
             <tbody>
-              {reservations.map((res) => (
-                <tr key={res.id}>
-                  <td>{res.class}</td>
-                  <td>{res.day}</td>
-                  <td>{res.time}</td>
-                  <td>{res.coach}</td>
+              {nextClasses.length > 0 ? (
+                nextClasses.map((c) => (
+                  <tr key={c.id}>
+                    <td className="ps-3 fw-semibold">{c.sport?.name || "-"}</td>
+                    <td>{c.room?.name || "-"}</td>
+                    <td>{c.coach?.full_name || c.coach?.email || "-"}</td>
+                    <td>
+                      {c.schedules && c.schedules.length > 0 ? (
+                        c.schedules.slice(0, 2).map((s) => (
+                          <Badge key={s.id} className="me-1" style={{ backgroundColor: BRAND }}>
+                            {DIAS[s.day_of_week]} {formatTime(s.start_time)}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-muted">Sin horario</span>
+                      )}
+                      {c.schedules && c.schedules.length > 2 && (
+                        <span className="text-muted small">+{c.schedules.length - 2}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-center text-muted py-4">
+                    No hay clases disponibles por el momento.
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </Table>
-        </Col>
-
-        {/* 4. Perfil Rápido con datos reales */}
-        <Col md={4}>
-          <Card className="shadow-sm border-primary">
-            <Card.Header className="bg-primary text-white">Mi Perfil</Card.Header>
-            <Card.Body>
-              <Card.Title>{user?.full_name || "Sin nombre"}</Card.Title>
-              <Card.Text>
-                <strong>Correo:</strong> {user?.email || "No disponible"} <br />
-               {/*} <strong>Deporte favorito:</strong> {user?.favoriteSport || "No definido"} // se desativa info*/} 
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
-      {/* 3. Clases disponibles */}
-      <h4 className="text-primary mt-5 mb-3">Clases Disponibles</h4>
-      <Row>
-        {[1, 2, 3].map((item) => (
-          <Col md={4} key={item}>
-            <Card className="h-100 shadow-sm">
-              <Card.Img variant="top" src={`https://picsum.photos/300/150?random=${item}`} />
-              <Card.Body>
-                <Card.Title>Clase de Fitness {item}</Card.Title>
-                <Card.Text>Entrenamiento intenso para mejorar tu resistencia física.</Card.Text>
-                <Button variant="primary">Reservar</Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+        </Card.Body>
+      </Card>
     </Container>
   );
 }
