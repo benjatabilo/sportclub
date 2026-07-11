@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Table, Spinner, Badge } from "react-bootstrap";
+import { Container, Row, Col, Card, Table } from "react-bootstrap";
 import { getUsers } from "../../services/userService";
 import { getRooms } from "../../services/roomService";
 import { getSports } from "../../services/sportService";
 import { getClassSchedules } from "../../services/classScheduleService";
+import ScheduleBadge from "../../components/ScheduleBadge";
+import StatusBadge from "../../components/StatusBadge";
+import PageLoader from "../../components/PageLoader";
+import EmptyTableRow from "../../components/EmptyTableRow";
 import Swal from "sweetalert2";
 
 const BRAND = "#ff7c2a";
-const DIAS = { 1: "Lun", 2: "Mar", 3: "Mié", 4: "Jue", 5: "Vie", 6: "Sáb", 7: "Dom" };
 
 // Fetch directo para /sport-rooms, sin depender de un service aparte
 // (mismo patrón explícito que el resto de los servicios del proyecto).
@@ -27,10 +30,6 @@ async function getSportRoomsInline() {
   return data;
 }
 
-function formatTime(t) {
-  return t ? t.substring(0, 5) : "N/A";
-}
-
 // Ícono simple de mancuerna, en SVG puro (sin dependencias externas)
 function DumbbellIcon({ size = 26, color = "#fff" }) {
   return (
@@ -44,26 +43,21 @@ function DumbbellIcon({ size = 26, color = "#fff" }) {
   );
 }
 
-function StatCard({ label, value, icon }) {
+function StatCard({ label, value }) {
   return (
     <Card
       className="border-0 h-100 text-white shadow-sm"
       style={{
-        background: `linear-gradient(135deg, ${BRAND} 0%, #330063 130%)`,
+        background: `linear-gradient(135deg, ${BRAND} 0%, #2b2b2b 130%)`,
         borderRadius: "1rem",
       }}
     >
       <Card.Body className="d-flex flex-column align-items-center justify-content-center text-center py-4">
         <div
           className="d-flex align-items-center justify-content-center mb-2"
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.15)",
-          }}
+          style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.15)" }}
         >
-          {icon}
+          <DumbbellIcon />
         </div>
         <h2 className="fw-bold mb-0" style={{ fontSize: "2.5rem" }}>
           {value}
@@ -120,27 +114,23 @@ function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <Container fluid className="py-5 text-center">
-        <Spinner animation="border" style={{ color: BRAND }} />
-      </Container>
-    );
+    return <PageLoader color={BRAND} fluid />;
   }
 
   return (
     <Container fluid className="py-4">
       <Row className="g-3 mb-4">
         <Col md={3} sm={6}>
-          <StatCard label="Usuarios" value={stats.users} icon={<DumbbellIcon />} />
+          <StatCard label="Usuarios" value={stats.users} />
         </Col>
         <Col md={3} sm={6}>
-          <StatCard label="Clases en la semana" value={stats.classesWeek} icon={<DumbbellIcon />} />
+          <StatCard label="Clases en la semana" value={stats.classesWeek} />
         </Col>
         <Col md={3} sm={6}>
-          <StatCard label="Salas" value={stats.rooms} icon={<DumbbellIcon />} />
+          <StatCard label="Salas" value={stats.rooms} />
         </Col>
         <Col md={3} sm={6}>
-          <StatCard label="Deportes" value={stats.sports} icon={<DumbbellIcon />} />
+          <StatCard label="Deportes" value={stats.sports} />
         </Col>
       </Row>
 
@@ -176,13 +166,14 @@ function AdminDashboard() {
                     <td>
                       {a.schedules && a.schedules.length > 0 ? (
                         a.schedules.slice(0, 2).map((s) => (
-                          <Badge
+                          <ScheduleBadge
                             key={s.id}
-                            className="me-1"
+                            dayOfWeek={s.day_of_week}
+                            startTime={s.start_time}
+                            showEndTime={false}
                             style={{ backgroundColor: BRAND }}
-                          >
-                            {DIAS[s.day_of_week]} {formatTime(s.start_time)}
-                          </Badge>
+                            className="me-1"
+                          />
                         ))
                       ) : (
                         <span className="text-muted">Sin horario</span>
@@ -192,18 +183,12 @@ function AdminDashboard() {
                       )}
                     </td>
                     <td>
-                      <Badge bg={a.status ? "success" : "secondary"}>
-                        {a.status ? "Activa" : "Inactiva"}
-                      </Badge>
+                      <StatusBadge active={a.status} activeLabel="Activa" inactiveLabel="Inactiva" />
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan="5" className="text-center text-muted py-4">
-                    No hay asignaciones registradas todavía.
-                  </td>
-                </tr>
+                <EmptyTableRow colSpan={5} message="No hay asignaciones registradas todavía." />
               )}
             </tbody>
           </Table>

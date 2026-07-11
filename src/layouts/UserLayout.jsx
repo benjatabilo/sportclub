@@ -26,7 +26,7 @@ function UserLayout() {
     <Container fluid className="p-0">
       <Row className="g-0">
         {/* Sidebar con estilo Admin */}
-        <Col md={2} className="bg-white vh-100 p-3 border-end shadow-sm">
+        <Col md={2} className="bg-white min-vh-100 p-3 border-end shadow-sm">
           <div className="mb-4 text-center">
             <img src={logo} alt="Logo" style={{ width: "120px" }} />
           </div>

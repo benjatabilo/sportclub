@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Spinner, Badge } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { getCoachDashboard } from "../../services/coachService";
+import ScheduleBadge from "../../components/ScheduleBadge";
+import PageLoader from "../../components/PageLoader";
 import Swal from "sweetalert2";
 
 const BRAND = "#4828a7";
-const DIAS = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo" };
-
-function formatTime(t) {
-  return t ? t.substring(0, 5) : "N/A";
-}
 
 // Ícono simple de mancuerna, en SVG puro (sin dependencias externas)
 function DumbbellIcon({ size = 26, color = "#fff" }) {
@@ -73,11 +70,7 @@ function CoachDashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <Container fluid className="py-5 text-center">
-        <Spinner animation="border" style={{ color: BRAND }} />
-      </Container>
-    );
+    return <PageLoader color={BRAND} fluid />;
   }
 
   const nextClass = data?.next_class;
@@ -122,9 +115,13 @@ function CoachDashboard() {
               <Col md={4}>
                 <small className="text-muted text-uppercase fw-semibold">Horario</small>
                 <p className="mb-0">
-                  <Badge style={{ backgroundColor: BRAND }} className="fs-6">
-                    {DIAS[nextClass.day_of_week]} {formatTime(nextClass.start_time)} - {formatTime(nextClass.end_time)}
-                  </Badge>
+                  <ScheduleBadge
+                    dayOfWeek={nextClass.day_of_week}
+                    startTime={nextClass.start_time}
+                    endTime={nextClass.end_time}
+                    style={{ backgroundColor: BRAND }}
+                    className="fs-6"
+                  />
                 </p>
               </Col>
             </Row>

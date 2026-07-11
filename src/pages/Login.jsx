@@ -33,39 +33,42 @@ function Login() {
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center min-vh-100" style={{ backgroundColor: 'rgb(28, 0, 84)' }}>
+    <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 " style={{ backgroundColor: 'rgb(28, 0, 84)' }}>
+      <Link to="/" className="d-inline-flex align-items-center text-decoration-none fw-semibold mb-3" style={{ fontSize: "0.9rem", color: "#ffffff" }}>
+        ← Volver al Inicio
+      </Link>
       <Container className="bg-white rounded-4 shadow-lg p-0 overflow-hidden" style={{ maxWidth: "900px" }}>
-        <Row className="g-0">
-          {/* Lado izquierdo (estética espejo al registro) */}
-          <Col md={5} className="text-white p-5 d-flex flex-column justify-content-center" style={{ backgroundColor: 'rgb(34, 0, 101)' }}>
-            <div style={{ fontSize: "9rem", color: "#ffc107", marginBottom: "-100px" }}>❝</div>
-            <h1 className="fw-bold" style={{ fontSize:"3rem" }}>¡Se tu mejor versión!     </h1>
-          </Col>
+      <Row className="g-0">
+        {/* Lado izquierdo (estética espejo al registro) */}
+        <Col md={5} className="text-white p-5 d-flex flex-column justify-content-center" style={{ backgroundColor: 'rgb(34, 0, 101)' }}>
+          <div style={{ fontSize: "9rem", color: "#ffc107", marginBottom: "-100px" }}>❝</div>
+          <h1 className="fw-bold" style={{ fontSize:"3rem" }}>¡Se tu mejor versión!     </h1>
+        </Col>
 
-          {/* Lado derecho (formulario login) */}
-          <Col md={7} className="p-5">
-            <div style={{ marginBottom: "40px" }}>
-              <h2 className="fw-bold" style={{ color: "#10004e", fontSize: "2rem", fontWeight: "700" }}>Iniciar Sesión</h2>
-              <p className="m-0">¿No tienes cuenta? <Link to="/register" className="text-decoration-none fw-bold">¡Regístrate aquí!</Link></p>
-            </div>
-            
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.8rem" }}>Correo</Form.Label>
-                <Form.Control type="email" onChange={(e) => setFormData({...formData, email: e.target.value})} required />
-              </Form.Group>
+        {/* Lado derecho (formulario login) */}
+        <Col md={7} className="p-5">
+          <div style={{ marginBottom: "40px" }}>
+            <h2 className="fw-bold" style={{ color: "#10004e", fontSize: "2rem", fontWeight: "700" }}>Iniciar Sesión</h2>
+            <p className="m-0">¿No tienes cuenta? <Link to="/register" className="text-decoration-none fw-bold">¡Regístrate aquí!</Link></p>
+          </div>
+          
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.8rem" }}>Correo</Form.Label>
+              <Form.Control type="email" onChange={(e) => setFormData({...formData, email: e.target.value})} required />
+            </Form.Group>
 
-              <Form.Group className="mb-4">
-                <Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.8rem" }}>Contraseña</Form.Label>
-                <Form.Control type="password" onChange={(e) => setFormData({...formData, password: e.target.value})} required />
-              </Form.Group>
+            <Form.Group className="mb-4">
+              <Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.8rem" }}>Contraseña</Form.Label>
+              <Form.Control type="password" onChange={(e) => setFormData({...formData, password: e.target.value})} required />
+            </Form.Group>
 
-              <Button type="submit" className="w-100 py-2 border-0 fw-bold" style={{ backgroundColor: '#ff9100' }} disabled={loading}>
-                {loading ? <Spinner size="sm" animation="border" className="me-2" /> : "Ingresar"}
-              </Button>
-            </Form>
-          </Col>
-        </Row>
+            <Button type="submit" className="w-100 py-2 border-0 fw-bold" style={{ backgroundColor: '#ff9100' }} disabled={loading}>
+              {loading ? <Spinner size="sm" animation="border" className="me-2" /> : "Ingresar"}
+            </Button>
+          </Form>
+        </Col>
+      </Row>
       </Container>
     </div>
   );

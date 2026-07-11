@@ -1,40 +1,21 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Spinner, Badge } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { getMySchedules } from "../../services/coachService";
+import { DIAS_SEMANA } from "../../components/ScheduleBadge";
+import PageLoader from "../../components/PageLoader";
+import EmptyTableRow from "../../components/EmptyTableRow";
+import TableCard from "../../components/TableCard";
 import Swal from "sweetalert2";
 
-// El backend usa day_of_week de 1 a 7 (1=Lunes ... 7=Domingo), ver
-// classSchedule.validator.js. No es el 0=Domingo de JS Date.getDay().
-const DAYS = {
-  1: "Lunes",
-  2: "Martes",
-  3: "Miércoles",
-  4: "Jueves",
-  5: "Viernes",
-  6: "Sábado",
-  7: "Domingo",
-};
+const BRAND = "#4828a7";
 
-/**
- * Alias reales definidos en src/models/index.js del backend:
- *   ClassSchedule.belongsTo(SportRoom, { as: "sportRoom" })
- *   SportRoom.belongsTo(Sport, { as: "sport" })
- *   SportRoom.belongsTo(Room,  { as: "room" })
- * Confirmado también en src/repositories/coach.repository.js (findMySchedules).
- */
-function getSportName(schedule) {
-  return schedule.sportRoom?.sport?.name || null;
-}
-
-function getRoomName(schedule) {
-  return schedule.sportRoom?.room?.name || null;
+function formatTime(t) {
+  return t ? t.substring(0, 5) : "N/A";
 }
 
 function CoachSchedule() {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const getDayName = (dayNumber) => DAYS[dayNumber] || "Día desconocido";
 
   const loadSchedules = async () => {
     try {
@@ -53,48 +34,59 @@ function CoachSchedule() {
     loadSchedules();
   }, []);
 
+  if (loading) {
+    return <PageLoader />;
+  }
+
   return (
-    <Container className="p-4">
-      <h3 className="mb-4">Mi Horario de Clases</h3>
-      {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <Table striped hover responsive className="bg-white shadow-sm rounded">
-          <thead className="table-light">
-            <tr>
-              <th>Día</th>
-              <th>Horario</th>
-              <th>Clase</th>
-              <th>Sala/Espacio</th>
-            </tr>
-          </thead>
-          <tbody>
-            {schedules.length > 0 ? (
-              schedules.map((s) => (
+    <TableCard title="Mi Horario de Clases" color={BRAND}>
+      <Table hover responsive className="mb-0 align-middle">
+        <thead>
+          <tr className="text-muted" style={{ fontSize: "0.8rem" }}>
+            <th className="ps-3 py-3">Día</th>
+            <th className="py-3">Horario</th>
+            <th className="py-3">Clase</th>
+            <th className="pe-3 py-3">Sala/Espacio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {schedules.length > 0 ? (
+            schedules.map((s) => {
+              const sport = s.sportRoom?.sport;
+              const room = s.sportRoom?.room;
+              return (
                 <tr key={s.id}>
-                  <td className="align-middle fw-bold">{getDayName(s.day_of_week)}</td>
-                  <td className="align-middle">
-                    <Badge bg="secondary">
-                      {s.start_time?.substring(0, 5)} - {s.end_time?.substring(0, 5)}
-                    </Badge>
+                  <td className="ps-3">
+                    <span className="badge bg-light text-dark border fw-normal">
+                      {DIAS_SEMANA[s.day_of_week] || "Día desconocido"}
+                    </span>
                   </td>
-                  <td className="align-middle">{getSportName(s) || "Sin nombre"}</td>
-                  <td className="align-middle">{getRoomName(s) || "Sin asignar"}</td>
+                  <td className="text-muted text-nowrap">{formatTime(s.start_time)} - {formatTime(s.end_time)}</td>
+                  <td>
+                    <div className="fw-semibold">
+                      {sport?.name || "Sin nombre"}
+                      {sport?.duration ? ` (${sport.duration} min)` : ""}
+                    </div>
+                    {sport?.objective && (
+                      <div className="text-muted" style={{ fontSize: "0.82rem" }}>{sport.objective}</div>
+                    )}
+                  </td>
+                  <td className="pe-3">
+                    <div>{room?.name || "Sin asignar"}</div>
+                    <div className="text-muted" style={{ fontSize: "0.82rem" }}>
+                      {room?.location}
+                      {room?.capacity ? ` · Capacidad: ${room.capacity}` : ""}
+                    </div>
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center text-muted">
-                  No tienes horarios registrados actualmente.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      )}
-    </Container>
+              );
+            })
+          ) : (
+            <EmptyTableRow colSpan={4} message="No tienes horarios registrados actualmente." />
+          )}
+        </tbody>
+      </Table>
+    </TableCard>
   );
 }
 

@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, Card, Spinner, Table } from "react-bootstrap";
+import { Badge, Button, Table } from "react-bootstrap";
 import Swal from "sweetalert2";
 import UserFormModal from "../../components/users/UserFormModal";
+import PageLoader from "../../components/PageLoader";
+import EmptyTableRow from "../../components/EmptyTableRow";
+import TableCard from "../../components/TableCard";
+import ActionButtons from "../../components/ActionButtons";
 import {
   createUser,
   deleteUser,
@@ -84,82 +88,67 @@ function UsersPage() {
     }
   };
 
-  return (
-    <div className="container py-4">
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 
-          className="mb-0" 
-          style={{ fontSize: '1.4rem', color: '#515151' }}
-        >
-          Gestión de Usuarios
-        </h2>
-        <Button 
-          onClick={openCreateModal}
-          className="fw-bold btn-sm px-3 py-2"
-          style={{ 
-            backgroundColor: '#ff7c2a', 
-            borderColor: '#ffbb00', 
-            fontSize: '0.7rem', 
-            color: '#ffffff' 
-          }}
-        >
-          Nuevo Usuario
-        </Button>
-      </div>
+  if (loading) {
+    return <PageLoader message="Cargando usuarios..." />;
+  }
 
-      {/* Content */}
-      {loading ? (
-        <div className="text-center py-5">
-          <Spinner animation="border" />
-          <p>Cargando usuarios...</p>
-        </div>
-      ) : (
-        <Card className="shadow-sm">
-          <Table responsive hover className="mb-0 align-middle">
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
+  return (
+    <>
+      <TableCard title="Gestión de Usuarios" actionLabel="+ Nuevo Usuario" onAction={openCreateModal}>
+        <Table responsive hover className="mb-0 align-middle">
+          <thead>
+            <tr className="text-muted" style={{ fontSize: "0.8rem" }}>
+              <th className="ps-3 py-2">Usuario</th>
+              <th className="py-2">Correo</th>
+              <th className="py-2">Rol</th>
+              <th className="py-2">Fecha de Nacimiento</th>
+              <th className="pe-3 py-2 text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length > 0 ? (
+              users.map((user) => (
                 <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.full_name}</td>
-                  <td>{user.email}</td>
+                  <td className="ps-3">
+                    <div className="d-flex align-items-center gap-2">
+                      <div
+                        className="d-flex align-items-center justify-content-center flex-shrink-0"
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: "50%",
+                          backgroundColor: "rgba(255,124,42,0.15)",
+                          color: "#ff7c2a",
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        {user.full_name?.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="fw-semibold">{user.full_name}</span>
+                    </div>
+                  </td>
+                  <td className="text-muted">{user.email}</td>
                   <td>
                     <Badge bg={user.role === "admin" ? "danger" : "info"}>
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </Badge>
                   </td>
-                  <td>
-                    <Button 
-                      variant="outline-primary" 
-                      size="sm" 
-                      className="me-2" 
-                      onClick={() => openEditModal(user)}
-                    >
-                      Editar
-                    </Button>
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm" 
-                      onClick={() => handleDelete(user)}
-                    >
-                      Eliminar
-                    </Button>
+                  <td className="text-muted">{user.birth_date || "-"}</td>
+                  <td className="pe-3">
+                    <ActionButtons
+                      onEdit={() => openEditModal(user)}
+                      onDelete={() => handleDelete(user)}
+                    />
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Card>
-      )}
+              ))
+            ) : (
+              <EmptyTableRow colSpan={5} message="No hay usuarios registrados." />
+            )}
+          </tbody>
+        </Table>
+      </TableCard>
 
       <UserFormModal
         show={showModal}
@@ -167,7 +156,7 @@ function UsersPage() {
         handleSave={handleSave}
         selectedUser={selectedUser}
       />
-    </div>
+    </>
   );
 }
 

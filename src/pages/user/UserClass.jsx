@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Button, Spinner } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import { getAvailableClasses } from "../../services/memberService";
 import { createReservation } from "../../services/reservationService";
+import { DIAS_SEMANA, formatTime } from "../../components/ScheduleBadge";
+import PageLoader from "../../components/PageLoader";
+import EmptyTableRow from "../../components/EmptyTableRow";
+import TableCard from "../../components/TableCard";
+import { IconButton } from "../../components/ActionButtons";
+import { CalendarCheckIcon } from "../../components/icons";
+import MotivationalBackground from "../../components/MotivationalBackground";
 import Swal from "sweetalert2";
 
-const DIAS = { 1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo" };
-
-function formatTime(t) {
-  return t ? t.substring(0, 5) : "N/A";
-}
+const BRAND = "#006b71";
 
 /**
  * GET /member/classes devuelve asignaciones (SportRoom) con sport, room, coach
@@ -26,7 +29,11 @@ function flattenSchedules(sportRooms) {
         start_time: schedule.start_time,
         end_time: schedule.end_time,
         sportName: sr.sport?.name || "Deporte",
+        sportObjective: sr.sport?.objective,
+        sportDuration: sr.sport?.duration,
         roomName: sr.room?.name || "Sala",
+        roomLocation: sr.room?.location,
+        roomCapacity: sr.room?.capacity,
         coachEmail: sr.coach?.email,
       });
     });
@@ -74,54 +81,65 @@ function UserClass() {
   };
 
   if (loading) {
-    return (
-      <Container className="p-4 text-center">
-        <Spinner animation="border" />
-      </Container>
-    );
+    return <PageLoader />;
   }
 
   return (
-    <Container className="p-4">
-      <h3 className="mb-4">Clases Disponibles</h3>
-      <Table striped hover responsive className="bg-white shadow-sm rounded">
-        <thead className="table-light">
-          <tr>
-            <th>Día</th>
-            <th>Horario</th>
-            <th>Información de la Clase</th>
-            <th>Acción</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clases.length > 0 ? (
-            clases.map((c) => (
-              <tr key={c.scheduleId}>
-                <td className="align-middle">{DIAS[c.day_of_week] || "N/A"}</td>
-                <td className="align-middle">
-                  {formatTime(c.start_time)} - {formatTime(c.end_time)}
-                </td>
-                <td className="align-middle">
-                  {c.sportName} en {c.roomName}
-                  {c.coachEmail ? ` (Coach: ${c.coachEmail})` : ""}
-                </td>
-                <td className="align-middle">
-                  <Button variant="primary" size="sm" onClick={() => handleReservar(c.scheduleId)}>
-                    Reservar
-                  </Button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" className="text-center text-muted">
-                No hay clases disponibles por el momento.
-              </td>
+    <MotivationalBackground>
+      <TableCard title="Clases Disponibles" color={BRAND}>
+        <Table hover responsive className="mb-0 align-middle">
+          <thead>
+            <tr className="text-muted" style={{ fontSize: "0.8rem" }}>
+              <th className="ps-3 py-3">Día</th>
+              <th className="py-3">Horario</th>
+              <th className="py-3">Clase</th>
+              <th className="pe-3 py-3 text-end">Acción</th>
             </tr>
-          )}
-        </tbody>
-      </Table>
-    </Container>
+          </thead>
+          <tbody>
+            {clases.length > 0 ? (
+              clases.map((c) => (
+                <tr key={c.scheduleId}>
+                  <td className="ps-3">
+                    <span className="badge bg-light text-dark border fw-normal">
+                      {DIAS_SEMANA[c.day_of_week] || "N/A"}
+                    </span>
+                  </td>
+                  <td className="text-muted text-nowrap">
+                    {formatTime(c.start_time)} - {formatTime(c.end_time)}
+                  </td>
+                  <td>
+                    <div className="fw-semibold">
+                      {c.sportName} en {c.roomName}
+                      {c.sportDuration ? ` (${c.sportDuration} min)` : ""}
+                    </div>
+                    <div className="text-muted" style={{ fontSize: "0.82rem" }}>
+                      {c.sportObjective}
+                      {c.roomCapacity ? ` · Capacidad: ${c.roomCapacity}` : ""}
+                      {c.roomLocation ? ` · ${c.roomLocation}` : ""}
+                      {c.coachEmail ? ` · Coach: ${c.coachEmail}` : ""}
+                    </div>
+                  </td>
+                  <td className="pe-3">
+                    <div className="d-flex justify-content-end">
+                      <IconButton
+                        label="Reservar"
+                        variant="outline-primary"
+                        onClick={() => handleReservar(c.scheduleId)}
+                      >
+                        <CalendarCheckIcon />
+                      </IconButton>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <EmptyTableRow colSpan={4} message="No hay clases disponibles por el momento." />
+            )}
+          </tbody>
+        </Table>
+      </TableCard>
+    </MotivationalBackground>
   );
 }
 

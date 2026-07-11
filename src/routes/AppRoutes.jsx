@@ -4,6 +4,7 @@ import Home from "../pages/Home"
 import Login from "../pages/Login"
 import Register from "../pages/Register"
 import Unauthorized from "../pages/Unauthorized"
+import PublicLayout from "../layouts/PublicLayout"
 
 import UserDashboard from "../pages/user/UserDashboard"
 import CoachDashboard from "../pages/coach/CoachDashboard"
@@ -34,7 +35,9 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Home />} />
+        </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/unauthorized" element={<Unauthorized />} /> 

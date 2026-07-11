@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { Container, Table, Badge, Spinner, Card } from "react-bootstrap";
+import { Container, Table, Card } from "react-bootstrap";
 import { getMyClasses } from "../../services/coachService";
+import { DIAS_SEMANA, formatTime } from "../../components/ScheduleBadge";
+import StatusBadge from "../../components/StatusBadge";
+import PageLoader from "../../components/PageLoader";
+import EmptyTableRow from "../../components/EmptyTableRow";
 import Swal from "sweetalert2";
 
-const DAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-function formatTime(t) {
-  return t ? t.substring(0, 5) : "N/A";
-}
+const BRAND = "#4828a7";
 
 function CoachClass() {
   const [clases, setClases] = useState([]);
@@ -31,41 +31,59 @@ function CoachClass() {
     loadClases();
   }, []);
 
+  if (loading) {
+    return <PageLoader />;
+  }
+
   return (
-    <Container className="p-4">
-      <h3 className="mb-4">Mis Clases Asignadas</h3>
-      {loading ? (
-        <div className="text-center">
-          <Spinner animation="border" />
-        </div>
-      ) : clases.length > 0 ? (
+    <Container className="py-4">
+      <h4 className="fw-bold mb-4" style={{ color: BRAND }}>Mis Clases Asignadas</h4>
+      {clases.length > 0 ? (
         clases.map((clase) => (
-          <Card key={clase.id} className="mb-3 shadow-sm">
+          <Card
+            key={clase.id}
+            className="mb-3 border-0 shadow-sm"
+            style={{ borderRadius: "0.9rem", borderLeft: `4px solid ${BRAND}` }}
+          >
             <Card.Body>
-              <div className="d-flex justify-content-between align-items-start flex-wrap">
-                <div>
-                  <Card.Title className="mb-1">
+              <div className="position-relative mb-1">
+                <div className="position-absolute top-0 end-0">
+                  <StatusBadge active={clase.status} activeLabel="Activa" inactiveLabel="Inactiva" />
+                </div>
+                <div className="text-center">
+                  <Card.Title className="mb-1 fw-bold">
                     {clase.sport?.name || "Sin deporte"}
                   </Card.Title>
-                  <Card.Subtitle className="text-muted mb-2">
+                  <Card.Subtitle className="text-muted" style={{ fontSize: "0.85rem" }}>
                     Sala: {clase.room?.name || "Sin asignar"}
                     {clase.room?.location ? ` · ${clase.room.location}` : ""}
+                    {clase.room?.capacity ? ` · Capacidad: ${clase.room.capacity}` : ""}
                   </Card.Subtitle>
                 </div>
-                <Badge bg={clase.status ? "success" : "secondary"}>
-                  {clase.status ? "Activa" : "Inactiva"}
-                </Badge>
               </div>
 
               {clase.sport?.objective && (
-                <p className="mb-2 text-muted" style={{ fontSize: "0.9rem" }}>
+                <p className="mb-1 text-muted" style={{ fontSize: "0.88rem" }}>
                   {clase.sport.objective}
+                  {clase.sport?.duration ? ` · Duración: ${clase.sport.duration} min` : ""}
                 </p>
               )}
 
-              <Table size="sm" striped responsive className="mb-0 mt-2">
+              {clase.room?.description && (
+                <p className="mb-1 text-muted" style={{ fontSize: "0.85rem" }}>
+                  <strong>Sobre la sala:</strong> {clase.room.description}
+                </p>
+              )}
+
+              {clase.observation && (
+                <p className="mb-2 text-muted" style={{ fontSize: "0.85rem" }}>
+                  <strong>Observación:</strong> {clase.observation}
+                </p>
+              )}
+
+              <Table size="sm" hover responsive className="mb-0 mt-2">
                 <thead>
-                  <tr>
+                  <tr className="text-muted" style={{ fontSize: "0.78rem" }}>
                     <th>Día</th>
                     <th>Horario</th>
                     <th>Estado</th>
@@ -75,23 +93,19 @@ function CoachClass() {
                   {clase.schedules && clase.schedules.length > 0 ? (
                     clase.schedules.map((s) => (
                       <tr key={s.id}>
-                        <td>{DAYS[s.day_of_week] || "Día desconocido"}</td>
                         <td>
-                          {formatTime(s.start_time)} - {formatTime(s.end_time)}
+                          <span className="badge bg-light text-dark border fw-normal">
+                            {DIAS_SEMANA[s.day_of_week] || "Día desconocido"}
+                          </span>
                         </td>
+                        <td className="text-muted text-nowrap">{formatTime(s.start_time)} - {formatTime(s.end_time)}</td>
                         <td>
-                          <Badge bg={s.status ? "success" : "secondary"}>
-                            {s.status ? "Activo" : "Inactivo"}
-                          </Badge>
+                          <StatusBadge active={s.status} activeLabel="Activo" inactiveLabel="Inactivo" />
                         </td>
                       </tr>
                     ))
                   ) : (
-                    <tr>
-                      <td colSpan="3" className="text-center text-muted">
-                        Esta clase todavía no tiene horarios asignados.
-                      </td>
-                    </tr>
+                    <EmptyTableRow colSpan={3} message="Esta clase todavía no tiene horarios asignados." />
                   )}
                 </tbody>
               </Table>
