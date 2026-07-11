@@ -61,9 +61,8 @@ function Register() {
     }
   };
 
-  return (    
-
-    <div className="d-flex flex-column align-items-center justify-content-center min-vh-100" style={{ backgroundColor: 'rgb(28, 0, 84)' }}>
+  return (
+    <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 " style={{ backgroundColor: 'rgb(28, 0, 84)' }}>
       <Link to="/" className="d-inline-flex align-items-center text-decoration-none fw-semibold mb-3" style={{ fontSize: "0.9rem", color: "#ffffff" }}>
         ← Volver al Inicio
       </Link>
@@ -87,8 +86,13 @@ function Register() {
             </Row>
             <Row className="g-3 mb-3">
               <Col md={6}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>Fecha de Nacimiento</Form.Label><Form.Control type="date" size="sm" onChange={(e) => setFormData({...formData, birth_date: e.target.value})} required /></Form.Group></Col>
-              <Col md={6}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>Deporte Favorito</Form.Label><Form.Select size="sm" onChange={(e) => setFormData({...formData, sport: e.target.value})}><option value="Fútbol">Fútbol</option><option value="Tenis">Tenis</option><option value="Basquetbol">Basquetbol</option><option value="Otro">Otro</option><option value="Ninguno">Ninguno</option></Form.Select></Form.Group></Col>
+              <Col md={6}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>Deporte Favorito</Form.Label><Form.Select size="sm" value={formData.sport} onChange={(e) => setFormData({...formData, sport: e.target.value})}><option value="Fútbol">Fútbol</option><option value="Tenis">Tenis</option><option value="Basquetbol">Basquetbol</option><option value="Otro">Otro</option><option value="Ninguno">Ninguno</option></Form.Select></Form.Group></Col>
             </Row>
+            {formData.sport === "Otro" && (
+              <Row className="g-3 mb-3">
+                <Col md={12}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>¿Cuál deporte?</Form.Label><Form.Control type="text" size="sm" placeholder="Ej: Natación" value={formData.otherSport} onChange={(e) => setFormData({...formData, otherSport: e.target.value})} required /></Form.Group></Col>
+              </Row>
+            )}
             <Row className="g-3 mb-4">
               <Col md={6}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>Contraseña</Form.Label><Form.Control type="password" size="sm" onChange={(e) => setFormData({...formData, password: e.target.value})} required /></Form.Group></Col>
               <Col md={6}><Form.Group><Form.Label className="d-block text-start fw-semibold" style={{ fontSize: "0.7rem" }}>Confirmar Contraseña</Form.Label><Form.Control type="password" size="sm" onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})} required /></Form.Group></Col>
