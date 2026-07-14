@@ -14,13 +14,12 @@ import UserLayout from "../layouts/UserLayout"
 import CoachLayout from "../layouts/CoachLayout"
 import AdminLayout from "../layouts/AdminLayout"
 
-import ProtectedRoute from "./ProtectedRoute"
 import RoleRoute from "./RoleRoute"
 import UsersPage from "../pages/admin/UsersPage"
 
 import Salas from "../pages/admin/Salas"
 import Assignments from "../pages/admin/Assignments"
-import Schedules from "../pages/admin/Shedules"
+import Schedules from "../pages/admin/Schedules"
 import Sports from "../pages/admin/Sports"
 
 // IMPORTACIONES PARA USUARIO//
@@ -62,12 +61,10 @@ function AppRoutes() {
           <Route path="salas" element={<Salas />} />
           <Route path="assignments" element={<Assignments />} />
           <Route path="sports" element={<Sports/>} />
-          <Route path="shedules" element={<Schedules />} />
+          <Route path="schedules" element={<Schedules />} />
 
 
         </Route>
-
-        <Route path="/perfil" element={<ProtectedRoute><h1>Perfil del usuario autenticado</h1></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Container, Row, Col, Nav, Button, Modal } from "react-bootstrap";
+import { Container, Row, Col, Nav, Button } from "react-bootstrap";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getUser, logout, saveSession } from "../services/authService";
 import logo from "../assets/logo.png";
-import Assigments from "../pages/admin/Assignments";
 import UserProfile from "../pages/UserProfile";
 import { HomeIcon, UsersIcon, BuildingIcon, DumbbellNavIcon, CalendarNavIcon, LinkIcon } from "../components/icons";
 
@@ -12,7 +11,6 @@ const SIDEBAR_BG = "#1a1420";
 
 function AdminLayout() {
   const navigate = useNavigate();
-  const [showSportModal, setShowSportModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [userData, setUserData] = useState(getUser());
 
@@ -26,7 +24,8 @@ function AdminLayout() {
     { to: "/admin/users", label: "Gestionar Usuarios", icon: UsersIcon },
     { to: "/admin/salas", label: "Gestión de Salas", icon: BuildingIcon },
     { to: "/admin/sports", label: "Gestión Deportes", icon: DumbbellNavIcon },
-    { to: "/admin/shedules", label: "Gestión de Horarios", icon: CalendarNavIcon },
+    { to: "/admin/schedules", label: "Gestión de Horarios", icon: CalendarNavIcon },
+    { to: "/admin/assignments", label: "Asignaciones", icon: LinkIcon },
   ];
 
   return (
@@ -65,14 +64,6 @@ function AdminLayout() {
                 {link.label}
               </NavLink>
             ))}
-            <div
-              className="nav-link px-3 py-2 rounded-2 text-white-50 d-flex align-items-center gap-2 text-nowrap"
-              style={{ fontSize: "0.8rem", textAlign: "left", cursor: "pointer" }}
-              onClick={() => setShowSportModal(true)}
-            >
-              <LinkIcon />
-              Asignaciones
-            </div>
           </Nav>
         </Col>
 
@@ -116,14 +107,6 @@ function AdminLayout() {
           </div>
         </Col>
       </Row>
-
-      {/* Modal de Asignaciones */}
-      <Modal show={showSportModal} onHide={() => setShowSportModal(false)} size="lg">
-        <Modal.Header closeButton closeVariant="white" className="text-white border-0" style={{ backgroundColor: BRAND }}>
-          <Modal.Title className="fw-bold">Asignaciones</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="p-0"><Assigments /></Modal.Body>
-      </Modal>
 
       {/* Modal de Perfil */}
       <UserProfile
