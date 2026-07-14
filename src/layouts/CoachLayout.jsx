@@ -4,7 +4,7 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { getUser, logout, saveSession } from "../services/authService";
 import logo from "../assets/logo.png";
 import UserProfile from "../pages/UserProfile";
-import { HomeIcon, DumbbellNavIcon, CalendarNavIcon } from "../components/icons";
+import { HomeIcon, DumbbellNavIcon, CalendarNavIcon } from "../components/Icons";
 
 const BRAND = "#4828a7";
 const DARK = "#1a1420";
