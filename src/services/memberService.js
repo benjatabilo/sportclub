@@ -1,86 +1,47 @@
-const API_URL = "http://localhost:3000/api/member";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // --- Helpers de autenticación ---
 const getToken = () => localStorage.getItem("token");
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
-  Authorization: `Bearer ${getToken()}`,
+  ...(getToken() && { Authorization: `Bearer ${getToken()}` }),
 });
+
+/** * Helper centralizado para todas las peticiones GET
+ */
+async function apiRequest(endpoint) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error en la petición a la API");
+  }
+  return data;
+}
 
 // --- Métodos de la API ---
 
-/** Obtener las clases disponibles para reservar */
 export async function getAvailableClasses() {
-  const response = await fetch(`${API_URL}/classes`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener las clases disponibles");
-  }
-  return data;
+  return await apiRequest("/classes");
 }
 
-/** Obtener el detalle de una clase disponible por id */
 export async function getClassDetail(id) {
-  const response = await fetch(`${API_URL}/classes/${id}`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener el detalle de la clase");
-  }
-  return data;
+  return await apiRequest(`/classes/${id}`);
 }
 
-/** Obtener el listado de deportes disponibles */
 export async function getAvailableSports() {
-  const response = await fetch(`${API_URL}/sports`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener los deportes disponibles");
-  }
-  return data;
+  return await apiRequest("/sports");
 }
 
-/** Obtener el listado de salas disponibles */
 export async function getAvailableRooms() {
-  const response = await fetch(`${API_URL}/rooms`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener las salas disponibles");
-  }
-  return data;
+  return await apiRequest("/rooms");
 }
 
-/** Obtener el resumen del dashboard del usuario autenticado */
 export async function getMemberDashboard() {
-  const response = await fetch(`${API_URL}/dashboard`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error al obtener el dashboard");
-  }
-  return data;
+  return await apiRequest("/dashboard");
 }

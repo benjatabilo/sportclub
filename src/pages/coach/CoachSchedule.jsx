@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
-import { getMySchedules } from "../../services/coachService";
+import { getMySchedules } from "../../services/CoachService";
 import { DIAS_SEMANA } from "../../components/ScheduleBadge";
 import PageLoader from "../../components/PageLoader";
 import EmptyTableRow from "../../components/EmptyTableRow";

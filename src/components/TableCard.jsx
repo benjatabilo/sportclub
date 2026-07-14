@@ -3,12 +3,7 @@ import { Container, Card, Button } from "react-bootstrap";
 const DEFAULT_COLOR = "#ff7c2a";
 const DARK = "#1a1420";
 
-/**
- * Envoltorio visual para las tablas de gestión (Deportes, Salas, Horarios,
- * Asignaciones, Usuarios), con el mismo lenguaje que ya usan los dashboards
- * y el layout: header en degradado oscuro→color de marca (igual que la
- * barra superior del admin), card blanca con sombra, texto compacto.
- */
+
 function TableCard({ title, color = DEFAULT_COLOR, actionLabel, onAction, children }) {
   return (
     <Container fluid className="py-4">

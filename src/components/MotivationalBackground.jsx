@@ -6,11 +6,7 @@ const FRASES_MOTIVACIONALES = [
   "CONSTANCIA",
 ];
 
-/**
- * Envuelve el contenido de una página con un fondo decorativo de frases
- * motivacionales repetidas, detrás del contenido (no tapa el color de
- * fondo real de la página, que sigue siendo el del layout).
- */
+
 function MotivationalBackground({ children }) {
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>

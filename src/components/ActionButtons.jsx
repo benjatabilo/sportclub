@@ -17,11 +17,6 @@ export function IconButton({ label, variant, onClick, children }) {
   );
 }
 
-/**
- * Grupo compacto de botones de acción (Editar / Activar-Desactivar / Eliminar)
- * con ícono + tooltip, reutilizado en las tablas de gestión. onToggleStatus
- * es opcional (Usuarios, por ejemplo, no tiene esa acción).
- */
 function ActionButtons({ onEdit, onDelete, onToggleStatus, active }) {
   return (
     <div className="d-flex justify-content-end gap-2">

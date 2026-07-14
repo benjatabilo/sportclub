@@ -1,8 +1,7 @@
 import { Container, Spinner } from "react-bootstrap";
 
-/**
- * Spinner de carga reutilizable para páginas que esperan datos del backend.
- * Antes este mismo bloque estaba copiado en 11 archivos distintos.
+/*
+Spinner de carga reutilizable para páginas que esperan datos del backend.
  */
 function PageLoader({ color, fluid = false, message }) {
   return (

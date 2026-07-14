@@ -1,7 +1,9 @@
-const API_URL = "http://localhost:3000/api/auth";
+// Usamos la variable de entorno configurada en .env
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function loginUser(credentials) {
-  const response = await fetch(`${API_URL}/login`, {
+  // Ahora la petición apunta a /api/auth/login
+  const response = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -18,29 +20,25 @@ export async function loginUser(credentials) {
   return data;
 }
 
-// para guardar la sesion en el nav.
+// Funciones de gestión de sesión (se mantienen igual)
 export function saveSession(token, user) {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
 }
 
-// Obtener token
 export function getToken() {
   return localStorage.getItem("token");
 }
 
-// Obtener usuario
 export function getUser() {
   const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;
 }
 
-// Verificar si existe sesión
 export function isAuthenticated() {
   return Boolean(getToken());
 }
 
-// Cerrar sesión
 export function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");

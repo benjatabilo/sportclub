@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { getCoachDashboard } from "../../services/coachService";
+import { getCoachDashboard } from "../../services/Coachservice";
 import ScheduleBadge from "../../components/ScheduleBadge";
 import PageLoader from "../../components/PageLoader";
 import Swal from "sweetalert2";

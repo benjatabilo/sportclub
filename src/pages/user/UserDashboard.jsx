@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Table } from "react-bootstrap";
 import { getMemberDashboard } from "../../services/memberService";
-import { getMyReservations } from "../../services/reservationService";
+import { getMyReservations } from "../../services/Reservationservice";
 import ScheduleBadge from "../../components/ScheduleBadge";
 import PageLoader from "../../components/PageLoader";
 import EmptyTableRow from "../../components/EmptyTableRow";
