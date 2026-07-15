@@ -1,49 +1,59 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "http://localhost:3000/api/reservations";
 
 // --- Helpers de autenticación ---
 const getToken = () => localStorage.getItem("token");
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
-  ...(getToken() && { Authorization: `Bearer ${getToken()}` }),
+  Authorization: `Bearer ${getToken()}`,
 });
-
-/** * Helper centralizado para todas las peticiones
- */
-async function apiRequest(endpoint, method = "GET", body = null) {
-  const options = {
-    method,
-    headers: getHeaders(),
-  };
-
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
-
-  const response = await fetch(`${API_URL}${endpoint}`, options);
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Error en la petición a la API");
-  }
-  return data;
-}
 
 // --- Métodos de la API ---
 
 /** Obtener las reservas del usuario autenticado */
 export async function getMyReservations() {
-  return await apiRequest("/my-reservations");
+  const response = await fetch(`${API_URL}/my-reservations`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al obtener tus reservas");
+  }
+  return data;
 }
 
 /** Crear una nueva reserva para un horario de clase */
 export async function createReservation(class_schedule_id) {
-  // Asegúrate de que el endpoint sea el correcto (ej. /reservations)
-  return await apiRequest("/reservations", "POST", { class_schedule_id });
+  const response = await fetch(API_URL, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ class_schedule_id }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al crear la reserva");
+  }
+  return data;
 }
 
 /** Cancelar una reserva existente */
 export async function cancelReservation(id) {
-  // Usamos PATCH como requiere tu backend
-  return await apiRequest(`/reservations/${id}/cancel`, "PATCH");
+  // El backend no tiene DELETE /reservations/:id, solo
+  // PATCH /reservations/:id/cancel (ver reservation.routes.js).
+  const response = await fetch(`${API_URL}/${id}/cancel`, {
+    method: "PATCH",
+    headers: getHeaders(),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Error al cancelar la reserva");
+  }
+  return data;
 }

@@ -1,17 +1,15 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = "http://localhost:3000/api/class-schedules";
 
 const getToken = () => localStorage.getItem("token");
 
 const getHeaders = () => ({
   "Content-Type": "application/json",
-  // Se incluye el Bearer token solo si existe
-  ...(getToken() && { Authorization: `Bearer ${getToken()}` }),
+  Authorization: `Bearer ${getToken()}`,
 });
 
 /** Obtener listado de horarios de clases */
 export async function getClassSchedules() {
-  // Asegúrate de concatenar el endpoint específico después del /api
-  const response = await fetch(`${API_URL}/classes/schedules`, {
+  const response = await fetch(API_URL, {
     method: "GET",
     headers: getHeaders(),
   });
