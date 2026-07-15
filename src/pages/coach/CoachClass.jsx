@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Table, Card } from "react-bootstrap";
-import { getMyClasses } from "../../services/Coachservice";
+import { getMyClasses } from "../../services/coachService";
 import { DIAS_SEMANA, formatTime } from "../../components/ScheduleBadge";
 import StatusBadge from "../../components/StatusBadge";
 import PageLoader from "../../components/PageLoader";
